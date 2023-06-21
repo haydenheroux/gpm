@@ -4,7 +4,8 @@ import (
 	"flag"
 	"fmt"
 	"os/exec"
-	"time"
+
+	tea "github.com/charmbracelet/bubbletea"
 )
 
 var (
@@ -30,10 +31,39 @@ func main() {
 
 	go procs.Run()
 
-	for {
-		time.Sleep(1 * time.Second)
-		for _, proc := range procs.procs {
-			fmt.Println(proc)
-		}
+	p := tea.NewProgram(procs)
+	if _, err := p.Run(); err != nil {
+		panic(err)
 	}
+}
+
+func (procs Processes) Init() tea.Cmd {
+	return nil
+}
+
+func (procs Processes) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+	switch msg := msg.(type) {
+
+	case tea.KeyMsg:
+
+		switch msg.String() {
+
+		case "ctrl+c", "q":
+			return procs, tea.Quit
+
+		}
+
+	}
+
+	return procs, nil
+}
+
+func (procs Processes) View() string {
+	s := ""
+
+	for _, proc := range procs.procs {
+		s += fmt.Sprintf("[%d] %s (%s) | pid: %d %b %s\n", proc.Id, proc.Name, proc.Version, proc.pid, proc.Alive, proc.startTime)
+	}
+
+	return s
 }
