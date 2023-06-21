@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"os/exec"
 	"time"
 )
@@ -28,8 +27,6 @@ func (proc *Process) Start(queue chan<- *Process) (err error) {
 
 	proc.pid = proc.Cmd.Process.Pid
 	proc.startTime = time.Now()
-
-	fmt.Println(proc.pid)
 
 	return proc.Cmd.Wait()
 }

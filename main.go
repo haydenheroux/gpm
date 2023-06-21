@@ -2,7 +2,9 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"os/exec"
+	"time"
 )
 
 var (
@@ -24,5 +26,14 @@ func main() {
 
 	procs := Processes{}
 	procs.Add(&Process{Id: 0, Name: "echo", Cmd: *exec.Command("echo", "Hello world!")})
+	procs.Add(&Process{Id: 1, Name: "sleep", Cmd: *exec.Command("sleep", "5")})
+
 	go procs.Run()
+
+	for {
+		time.Sleep(1 * time.Second)
+		for _, proc := range procs.procs {
+			fmt.Println(proc)
+		}
+	}
 }
