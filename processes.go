@@ -23,12 +23,14 @@ func (proc *Process) Start(queue chan<- *Process) (err error) {
 
 	proc.Alive = true
 
-	proc.Cmd.Start()
+	cmd := proc.Cmd
 
-	proc.pid = proc.Cmd.Process.Pid
+	cmd.Start()
+
+	proc.pid = cmd.Process.Pid
 	proc.startTime = time.Now()
 
-	return proc.Cmd.Wait()
+	return cmd.Wait()
 }
 
 type Processes struct {
