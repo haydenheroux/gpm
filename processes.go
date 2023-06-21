@@ -6,22 +6,21 @@ import (
 )
 
 type Process struct {
-	Alive     bool
+	alive     bool
 	Id        int
 	Name      string
 	pid       int
 	startTime time.Time
-	Version   string
 	Cmd       exec.Cmd
 }
 
 func (proc *Process) Start(queue chan<- *Process) (err error) {
 	defer func() {
-		proc.Alive = false
+		proc.alive = false
 		queue <- proc
 	}()
 
-	proc.Alive = true
+	proc.alive = true
 
 	cmd := proc.Cmd
 

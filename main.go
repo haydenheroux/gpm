@@ -70,7 +70,6 @@ func (procs Processes) View() string {
 	columns := []table.Column{
 		{Title: "id", Width: 16},
 		{Title: "name", Width: 22},
-		{Title: "version", Width: 16},
 		// TODO This width is super sensitive because of the styling
 		{Title: "alive", Width: 18},
 		{Title: "pid", Width: 16},
@@ -82,11 +81,9 @@ func (procs Processes) View() string {
 	for _, proc := range procs.procs {
 		id := cellStyle.Render(fmt.Sprint(proc.Id))
 		name := proc.Name
-		version := proc.Version
-
 		var alive, pid, uptime string
 
-		if proc.Alive {
+		if proc.alive {
 			alive = aliveStyle.Render("alive")
 			pid = fmt.Sprint(proc.pid)
 			uptime = time.Since(proc.startTime).String()
@@ -96,7 +93,7 @@ func (procs Processes) View() string {
 			uptime = ""
 		}
 
-		rows = append(rows, table.Row{id, name, version, alive, pid, uptime})
+		rows = append(rows, table.Row{id, name, alive, pid, uptime})
 	}
 
 	t := table.New(
