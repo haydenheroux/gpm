@@ -4,8 +4,11 @@ import (
 	"flag"
 	"fmt"
 	"os/exec"
+	"time"
 
+	"github.com/charmbracelet/bubbles/table"
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/charmbracelet/lipgloss"
 )
 
 var (
@@ -38,32 +41,62 @@ func main() {
 }
 
 func (procs Processes) Init() tea.Cmd {
-	return nil
+	return tickCmd()
 }
 
 func (procs Processes) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
-	switch msg := msg.(type) {
+	switch msg.(type) {
+		case tea.KeyMsg:
+					return procs, tea.Quit
 
-	case tea.KeyMsg:
+		case tickMsg:
+			return procs, tickCmd()
 
-		switch msg.String() {
-
-		case "ctrl+c", "q":
-			return procs, tea.Quit
-
-		}
-
+		default:
+			return procs, nil
 	}
-
-	return procs, nil
 }
 
-func (procs Processes) View() string {
-	s := ""
+var (
+	border = lipgloss.NewStyle().BorderStyle(lipgloss.NormalBorder()).BorderForeground(lipgloss.Color("240"))
+)
 
-	for _, proc := range procs.procs {
-		s += fmt.Sprintf("[%d] %s (%s) | pid: %d %v %s\n", proc.Id, proc.Name, proc.Version, proc.pid, proc.Alive, proc.startTime)
+func (procs Processes) View() string {
+	columns := []table.Column{
+		{Title: "id", Width: 6},
+		{Title: "name", Width: 22},
+		{Title: "version", Width: 16},
+		{Title: "pid", Width: 20},
+		{Title: "uptime", Width: 20},
+		{Title: "alive", Width: 8},
 	}
 
-	return s
+	rows := []table.Row{}
+
+	for _, proc := range procs.procs {
+		id := fmt.Sprint(proc.Id)
+		name := proc.Name
+		version := proc.Version
+		pid := fmt.Sprint(proc.pid)
+		uptime := time.Since(proc.startTime).String()
+		alive := fmt.Sprint(proc.Alive)
+		rows = append(rows, table.Row{id, name, version, pid, uptime, alive})
+	}
+
+	table := table.New(
+		table.WithColumns(columns),
+		table.WithRows(rows),
+		table.WithFocused(true),
+		table.WithHeight(10),
+	)
+
+	return border.Render(table.View()) + "\n"
+}
+
+type tickMsg time.Time
+
+func tickCmd() tea.Cmd {
+	return tea.Tick(50 * time.Millisecond, func (t time.Time) tea.Msg {
+		return tickMsg(t)
+	})
 }
