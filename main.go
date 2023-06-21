@@ -2,13 +2,13 @@ package main
 
 import (
 	"flag"
-	"fmt"
+	"os/exec"
 )
 
 var (
-	all bool
-	names string
-	ids string
+	all    bool
+	names  string
+	ids    string
 	config string
 )
 
@@ -22,46 +22,7 @@ func init() {
 func main() {
 	flag.Parse()
 
-	allProcesses := loadAll()
-
-	// Set containing processes to be started
-	var processes map[interface{}]struct{}
-
-	if all {
-		processes = allProcesses
-	} else {
-		processes = make(map[interface{}]struct{}, 0)
-	}
-
-	// Add processes to set if matching name
-	if names != "" && !all {
-		processesMatchingNames := allProcesses
-		for process := range processesMatchingNames {
-			processes[process] = struct{}{}
-		}
-	}
-
-	// Add processes to set if matching identifier
-	if ids != "" && !all {
-		processesMatchingIds := allProcesses
-		for process := range processesMatchingIds {
-			processes[process] = struct{}{}
-		}
-	}
-
-	// Start all processes in the set
-	for process := range processes {
-		go start(process)
-	}
-
-	// TODO Render GUI
-	fmt.Println("Monitoring processes...")
-}
-
-func loadAll() map[interface{}]struct{} {
-	return make(map[interface{}]struct{}, 0)
-}
-
-func start(process interface{}) {
-	fmt.Println("Started a process")
+	procs := Processes{}
+	procs.Add(&Process{Id: 0, Name: "echo", Cmd: *exec.Command("echo", "Hello world!")})
+	go procs.Run()
 }
