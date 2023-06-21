@@ -62,7 +62,7 @@ func (procs Processes) View() string {
 	s := ""
 
 	for _, proc := range procs.procs {
-		s += fmt.Sprintf("[%d] %s (%s) | pid: %d %b %s\n", proc.Id, proc.Name, proc.Version, proc.pid, proc.Alive, proc.startTime)
+		s += fmt.Sprintf("[%d] %s (%s) | pid: %d %v %s\n", proc.Id, proc.Name, proc.Version, proc.pid, proc.Alive, proc.startTime)
 	}
 
 	return s
